@@ -1,5 +1,6 @@
 package com.mycode.myscreenshot;
 
+import java.awt.BorderLayout;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
@@ -22,6 +23,7 @@ public class App {
     static int length = 0;
 
     public static void main(String[] args) throws Exception {
+        System.out.print("スクリーンショットくん起動中...");
         Main main = new Main();
         main.addRouteBuilder(new RouteBuilder() {
 
@@ -31,7 +33,7 @@ public class App {
 
                     @Override
                     public void process(Exchange exchng) throws Exception {
-                        System.out.println("起動が完了しました。\n終了する時は×ボタンかCtrl+Cを押してください。");
+                        System.out.println("起動が完了しました。\n\n　PrintScreenキー ・・・ スクリーンショットを撮影・保存\n　Ctrl+C または ウィンドウの閉じるボタン ・・・ プログラムを終了\n");
                     }
                 });
                 from("timer:foo?period=1s").choice().when(new Predicate() {
@@ -48,7 +50,10 @@ public class App {
                                 imageInByte = baos.toByteArray();
                             }
 
-                            if (length != imageInByte.length) {
+                            if (length == 0) {
+                                length = imageInByte.length;
+                                return false;
+                            } else if (length != imageInByte.length) {
                                 length = imageInByte.length;
                                 String format = new SimpleDateFormat("MMdd_HHmmss").format(new Date()) + ".png";
                                 exchange.getIn().setHeader(Exchange.FILE_NAME, format);
